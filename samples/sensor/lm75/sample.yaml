@@ -1,0 +1,8 @@
+sample:
+  name: LM75 Sensor Sample
+tests:
+  sample.sensor.lm75:
+    harness: sensor
+    tags: sensors
+    platform_allow: thingy52_nrf52832
+    depends_on: i2c

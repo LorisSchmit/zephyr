@@ -1,0 +1,15 @@
+/*
+ * Copyright (c) 2019 Linaro Limited
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+&i2c1 { /* SDA P0.26, SCL P0.27, ALERT P0.11 */
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	lm75@48 {
+		compatible = "lm75";
+		reg = <0x48>;
+		label = "LM75";
+	};
+};

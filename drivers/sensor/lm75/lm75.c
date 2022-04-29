@@ -35,6 +35,12 @@ static inline int lm75_reg_read(const struct lm75_config *cfg, uint8_t reg,
 	return i2c_burst_read(cfg->i2c_dev, cfg->i2c_addr, reg, buf, size);
 }
 
+static inline int lm75_reg_write(const struct lm75_config *cfg, uint8_t reg,
+				uint8_t *buf, uint32_t size)
+{
+	return i2c_burst_write(cfg->i2c_dev, cfg->i2c_addr, reg, buf, size);
+}
+
 static inline int lm75_fetch_temp(const struct lm75_config *cfg, struct lm75_data *data)
 {
 	int ret;
@@ -89,9 +95,32 @@ static int lm75_channel_get(const struct device *dev,
 	}
 }
 
+/* Function to set the config register*/
+static int lm75_attr_set(const struct device *dev,
+			    enum sensor_channel chan,
+			    enum sensor_attribute attr,
+			    const struct sensor_value *val)
+{
+	struct lm75_data *drv_data = dev->data;
+	const struct lm75_config *cfg = dev->config;
+	int ret;
+	if(attr == SENSOR_ATTR_CONFIGURATION){
+		uint8_t config_buf[3] = {LM75_REG_CONFIG, (uint8_t) val->val1, (uint8_t) val->val2};
+		ret = i2c_write(cfg->i2c_dev, config_buf, 
+                        2, cfg->i2c_addr);
+		if (ret) {
+			printf("Could not set attribute\n");
+			return -ENOTSUP;
+		}
+	}
+
+	return 0;
+}
+
 static const struct sensor_driver_api lm75_driver_api = {
 	.sample_fetch = lm75_sample_fetch,
 	.channel_get = lm75_channel_get,
+	.attr_set = lm75_attr_set,
 };
 
 int lm75_init(const struct device *dev)
